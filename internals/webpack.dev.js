@@ -9,8 +9,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = baseConfig({
   output: {
-    filename: '[name].js',
-    publicPath: '/'
+    filename: 'app.js'
   },
   module: {
     rules: [
@@ -20,7 +19,7 @@ module.exports = baseConfig({
           'style-loader',
           {
             loader: 'css-loader',
-            query: !process.env.CSS_MODULES_DISABLED ? {
+            options: !process.env.CSS_MODULES_DISABLED ? {
               modules: true,
               localIdentName: '[name]__[local]__[hash:base64:5]',
               camelCase: true

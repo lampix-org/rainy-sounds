@@ -30,14 +30,13 @@ module.exports = baseConfig({
           use: [
             {
               loader: 'css-loader',
-              query: !process.env.CSS_MODULES_DISABLED ? {
+              options: Object.assign({
+                minimize: true
+              }, !process.env.CSS_MODULES_DISABLED ? {
                 modules: true,
                 localIdentName: '[name]__[local]__[hash:base64:5]',
                 camelCase: true
-              } : undefined,
-              options: {
-                minimize: true
-              }
+              } : {}),
             }
           ]
         })
