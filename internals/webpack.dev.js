@@ -24,7 +24,7 @@ module.exports = baseConfig({
               modules: true,
               localIdentName: '[name]__[local]__[hash:base64:5]',
               camelCase: true
-            } : null
+            } : undefined
           }
         ]
       }

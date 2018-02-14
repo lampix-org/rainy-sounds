@@ -1,6 +1,7 @@
 const webpack = require('webpack');
 const path = require('path');
 const baseConfig = require('./webpack.base');
+const vendors = require('./vendors.json');
 
 require('dotenv').config();
 
@@ -10,12 +11,11 @@ const cwd = process.cwd();
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 
 module.exports = baseConfig({
   entry: {
-    vendor: [
-      '@lampix/core'
-    ]
+    vendor: vendors
   },
   output: {
     filename: 'app.[chunkhash].js',
@@ -34,7 +34,10 @@ module.exports = baseConfig({
                 modules: true,
                 localIdentName: '[name]__[local]__[hash:base64:5]',
                 camelCase: true
-              } : null
+              } : undefined,
+              options: {
+                minimize: true
+              }
             }
           ]
         })
@@ -51,6 +54,14 @@ module.exports = baseConfig({
       name: 'vendor',
       filename: '[name].[chunkhash].js',
       minChunks: Infinity
+    }),
+    new UglifyJsPlugin({
+      test: /\.js($|\?)/i,
+      uglifyOptions: {
+        compress: {
+          warnings: false
+        }
+      }
     }),
     // Extract app code to own file
     new HtmlWebpackPlugin({
