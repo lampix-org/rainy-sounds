@@ -12,7 +12,9 @@ It does not assume the technologies that will be used.
 
 ## Installation
 
-`git clone git@gitlab.rosoftlab.net:lampix/lampix-app-starter.git`
+`git clone git@gitlab.rosoftlab.net:lampix/lampix-app-starter.git`  
+`cd lampix-app-starter`  
+`npm install`
 
 ### Features
 
