@@ -1,11 +1,7 @@
 {
   "presets": [
     [
-      "@babel/preset-env", {
-        "targets": {
-          "chrome": 57
-        }
-      }
+      "@babel/preset-env"
     ]
   ],
   "plugins": [
