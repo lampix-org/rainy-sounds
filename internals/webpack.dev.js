@@ -19,7 +19,7 @@ module.exports = baseConfig({
           'style-loader',
           {
             loader: 'css-loader',
-            options: !process.env.CSS_MODULES_DISABLED ? {
+            options: process.env.CSS_MODULES_ENABLED ? {
               modules: true,
               localIdentName: '[name]__[local]__[hash:base64:5]',
               camelCase: true

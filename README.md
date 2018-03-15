@@ -23,7 +23,7 @@ If you're not improving the boilerplate, but rather starting a new app, go ahead
 ### CSS Modules
 
 This helps with keeping CSS maintainable as you'll be writing CSS for specific components, while avoiding name collisions automatically.
-By default, CSS modules are enabled. You can disable them by adding a `.env` file at the root of the project and specifying `CSS_MODULES_DISABLED=1`.
+By default, CSS modules are disabled. You can enable them by adding a `.env` file at the root of the project and specifying `CSS_MODULES_ENABLED=1`.
 
 
 ### HMR
