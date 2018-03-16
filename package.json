@@ -16,8 +16,10 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@lampix/core": "^0.1.2",
-    "@lampix/state": "^0.2.0"
+    "@lampix/core": "^0.4.1",
+    "@lampix/state": "^0.2.1",
+    "node-sass": "^4.7.2",
+    "sass-loader": "^6.0.7"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.40",

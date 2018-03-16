@@ -14,7 +14,7 @@ module.exports = baseConfig({
   module: {
     rules: [
       {
-        test: /\.css$/,
+        test: /\.s?css$/,
         use: [
           'style-loader',
           {
@@ -24,6 +24,9 @@ module.exports = baseConfig({
               localIdentName: '[name]__[local]__[hash:base64:5]',
               camelCase: true
             } : undefined
+          },
+          {
+            loader: 'sass-loader'
           }
         ]
       }
