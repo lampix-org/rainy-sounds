@@ -20,10 +20,10 @@
     "@lampix/state": "^0.2.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.0.0-beta.40",
-    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.40",
-    "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.40",
-    "@babel/preset-env": "^7.0.0-beta.40",
+    "@babel/core": "^7.0.0-beta.41",
+    "@babel/plugin-proposal-class-properties": "^7.0.0-beta.41",
+    "@babel/plugin-proposal-object-rest-spread": "^7.0.0-beta.41",
+    "@babel/preset-env": "^7.0.0-beta.41",
     "babel-eslint": "^8.2.1",
     "babel-loader": "^8.0.0-beta.0",
     "clean-webpack-plugin": "^0.1.18",
