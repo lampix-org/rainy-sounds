@@ -1,0 +1,60 @@
+
+/* basic styles for black background and crosshair cursor */
+body {
+	background: #000;
+	margin: 0;
+}
+
+canvas {
+	cursor: crosshair;
+	display: block;
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 1280px;
+	height: 800;
+	-webkit-user-select: none;  /* Chrome all / Safari all */
+  -moz-user-select: none;     /* Firefox all */
+  -ms-user-select: none;      /* IE 10+ */
+  user-select: none;          /* Likely future */      
+}
+
+#screensaver, #canvas {
+	display: none;
+}
+
+#screensaver {
+	position: relative;
+	width: 100vw;
+	height: 100vh;
+}
+
+#lampix-logo {
+	position: relative;
+	z-index: 1;
+	top: 50%;
+	left: 50%;
+	width: 70%;
+	transform: translate(-50%, -50%);
+}
+
+
+.screensaver-canvas-holder {
+	position: absolute;
+    left: 0;
+	top: 0;
+}
+
+#loading-message {
+	position: absolute;
+	top: 100px;
+	left: 100px;
+	width: 60%;
+	height: 60%;
+}
+
+
+#loading-message h1 {
+	color: #fff;
+	font-family: Calibri
+}
