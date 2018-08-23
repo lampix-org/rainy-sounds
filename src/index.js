@@ -8,6 +8,26 @@ import style from './css/style.css';
 import './utils/pathseg';
 import randomInt from './utils/randomInt';
 
+import audio1 from './assets/musical_notes/major/1.ogg';
+import audio2 from './assets/musical_notes/major/2.ogg';
+import audio3 from './assets/musical_notes/major/3.ogg';
+import audio4 from './assets/musical_notes/major/4.ogg';
+import audio5 from './assets/musical_notes/major/5.ogg';
+import audio6 from './assets/musical_notes/major/6.ogg';
+import audio7 from './assets/musical_notes/major/7.ogg';
+import audio8 from './assets/musical_notes/major/8.ogg';
+
+const audioList = [
+  audio1,
+  audio2,
+  audio3,
+  audio4,
+  audio5,
+  audio6,
+  audio7,
+  audio8
+];
+
 export default style;
 
 // Request Animation Frame is being called 30 times per second.
@@ -76,15 +96,6 @@ window.onload = loop;
 // Initializing the app.
 export function init() {
   if (lampixCore) {
-    const audioList = [];
-    const type = { notes: 8, scale: 'major' };
-    for (let i = 0; i < type.notes; i++) {
-      audioList.push(new Audio(`./src/assets/musical_notes/${type.scale}/${i + 1}.ogg`));
-      audioList.push(new Audio(`./src/assets/musical_notes/${type.scale}/${i + 1}.ogg`));
-      audioList.push(new Audio(`./src/assets/musical_notes/${type.scale}/${i + 1}.ogg`));
-      audioList.push(new Audio(`./src/assets/musical_notes/${type.scale}/${i + 1}.ogg`));
-      audioList.push(new Audio(`./src/assets/musical_notes/${type.scale}/${i + 1}.ogg`));
-    }
     let lastRandom;
     Events.on(matterSetup.engine, 'collisionStart', (event) => {
       const { pairs } = event;
@@ -95,8 +106,10 @@ export function init() {
           randomNr = Math.floor(randomInt(0, audioList.length));
         }
         lastRandom = randomNr;
-        audioList[randomNr].volume = 1;
-        audioList[randomNr].play();
+
+        const sound = new Audio(audioList[randomNr]);
+        sound.volume = 1;
+        sound.play();
       }
     });
 
