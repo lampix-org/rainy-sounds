@@ -28,11 +28,6 @@ export const settings = {
 
   // A list of all the image resources that the app will use.
   imageResources: [
-    'NouLinizio',
-    'NouDulsao',
-    'NouVivalto',
-    'NouRosabaya',
-    'NouRistretto'
   ],
 
   // A list of the products and their recommendations.
@@ -182,5 +177,5 @@ settings.imageResources.forEach((element) => {
 
 // These are the two classifier strings which will be used by the app for products and fingers.
 // export const classifierString = 'segm_cls_loc_nes;circle:10,70,0.65|area:10,60000|thresh:65';
-export const classifierString = 'segm_cls_loc_nes;circle:10,70,0.65|area:10,60000|thresh:65';
+export const classifierString = 'hand_classifier';
 export const fingerClassifierString = 'cls_loc_fin_all_small';

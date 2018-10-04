@@ -20,6 +20,7 @@
     "@lampix/physics": "^0.1.11",
     "animejs": "^2.2.0",
     "lodash.debounce": "^4.0.8",
+    "poly-decomp": "^0.3.0",
     "matter-js": "^0.14.2"
   },
   "devDependencies": {
