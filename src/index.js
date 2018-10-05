@@ -1,4 +1,4 @@
-import { World, Bodies } from 'matter-js';
+// import { World, Bodies } from 'matter-js';
 import lampixCore from '@lampix/core';
 import lampixPhysics from '@lampix/physics';
 import debounce from 'lodash.debounce';
@@ -185,7 +185,7 @@ export function init() {
           // placedObject.set(id, { obj: staticObject(cx, cy, 30), x: cx });
           // placedObject.set(id, { obj: createObjectFromVertices(cx, cy, classification.outline.points), x: cx });
           if (placedObject.get(id)) {
-            World.remove(matterSetup.world, placedObject.get(id).obj);
+            matterSetup.Matter.World.remove(matterSetup.world, placedObject.get(id).obj);
           }
           const { points } = classification.outline;
           const result = points.length > 100 ? [] : [{ x: 60, y: 0 }, { x: 120, y: 60 }, { x: 0, y: 120 }];
@@ -194,7 +194,19 @@ export function init() {
               result.push({ x: Math.round(point.posX - diffX), y: Math.round(point.posY - diffY) });
             }
           });
-          placedObject.set(id, { obj: createObjectFromVertices(cx, cy, result), x: cx });
+          // placedObject.set(id, { obj: createObjectFromVertices(cx, cy, result), x: cx });
+          const theOptions = {
+            x: cx,
+            y: cy,
+            vertices: result,
+            matterOptions: {
+              isStatic: true,
+              collisionFilter: {
+                category: 0x0002
+              }
+            }
+          };
+          placedObject.set(id, { obj: matterSetup.utils.createIrregular(theOptions), x: cx });
           element.innerHTML = '+';
           if (!firstObjectDetected) {
             firstObjectDetected = true;
@@ -208,21 +220,21 @@ export function init() {
   }
 }
 
-function createObjectFromVertices(cx, cy, outlines) {
-  const obj = Bodies.fromVertices(cx, cy, outlines, {
-    isStatic: true,
-    collisionFilter: {
-      category: 0x0002
-    },
-    render: {
-      fillStyle: '#444',
-      opacity: 0.4,
-      lineWidth: 0,
-    }
-  }, true);
-  World.add(matterSetup.engine.world, obj);
-  return obj;
-}
+// function createObjectFromVertices(cx, cy, outlines) {
+//   const obj = Bodies.fromVertices(cx, cy, outlines, {
+//     isStatic: true,
+//     collisionFilter: {
+//       category: 0x0002
+//     },
+//     render: {
+//       fillStyle: '#444',
+//       opacity: 0.4,
+//       lineWidth: 0,
+//     }
+//   }, true);
+//   World.add(matterSetup.engine.world, obj);
+//   return obj;
+// }
 
 // function staticObject(x, y, r) {
 //   const options = {
