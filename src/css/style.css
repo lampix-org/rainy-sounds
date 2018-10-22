@@ -1,5 +1,3 @@
-
-/* basic styles for black background and crosshair cursor */
 body {
 	background: #000;
 	margin: 0;
@@ -14,48 +12,25 @@ canvas {
 	top: 0;
 	width: 1280px;
 	height: 800;
-	-webkit-user-select: none;  /* Chrome all / Safari all */
-  -moz-user-select: none;     /* Firefox all */
-  -ms-user-select: none;      /* IE 10+ */
-  user-select: none;          /* Likely future */
+	user-select: none;
 }
 
-#screensaver, #canvas {
-	/* display: none; */
-}
-
-#screensaver {
-	position: relative;
-	width: 100vw;
-	height: 100vh;
-}
-
-#lampix-logo {
-	position: relative;
-	z-index: 1;
-	top: 50%;
-	left: 50%;
-	width: 70%;
-	transform: translate(-50%, -50%);
-}
-
-
-.screensaver-canvas-holder {
+.close-button {
 	position: absolute;
-    left: 0;
-	top: 0;
+	transform: translate(-50%, 50%);
+	width: 40px;
+	height: 40px;
+	margin: 0;
+	padding: 0;
 }
 
-#loading-message {
-	position: absolute;
-	top: 100px;
-	left: 100px;
-	width: 60%;
-	height: 60%;
+.close-app {
+	left: 50px;
+	top: 10px;
+	z-index: 6;
 }
 
-
-#loading-message h1 {
-	color: #fff;
-	font-family: Calibri
+.close-button svg path,
+.close-button svg polygon {
+	fill: #aaa;
 }

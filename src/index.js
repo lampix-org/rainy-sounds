@@ -1,9 +1,7 @@
-// import { World, Bodies } from 'matter-js';
+import { World, Bodies } from 'matter-js';
 import lampixCore from '@lampix/core';
 import lampixPhysics from '@lampix/physics';
-import debounce from 'lodash.debounce';
-import updateSimpleClassifiers from './utils/updateSimpleClassifiers';
-import { settings, classifierString } from './settings/datastructure';
+import settings from './settings/datastructure';
 import style from './css/style.css';
 import './utils/pathseg';
 import randomInt from './utils/randomInt';
@@ -39,30 +37,18 @@ let firstObjectDetected = false;
 const matterObject = [];
 const placedObject = new Map();
 // const vertexSets = [];
+
 placedObject.set(-1, { x: randomInt(cw / 2 - 30, cw / 2 + 30) });
 let refreshRate = 300;
 
-// See if the physics engine is required and instantiate it.
-let tempMatter;
-if (settings.appModules.physics) {
-// Setting up the Matter JS Physics library.
-  const mSetupOptions = {
-    width: 1280,
-    height: 800,
-    noWalls: settings.appModules.wallsDisabled,
-    noRenderer: settings.appModules.internalCanvasDisabled
-  };
-  const MatterSetup = lampixPhysics;
-  tempMatter = new MatterSetup(mSetupOptions);
-} else {
-  tempMatter = null;
-}
-export const matterSetup = tempMatter;
-
-export const simpleClassifiers = [];
-
-// Loading a debounce function for updating the simple classfiers.
-export const debouncedUpdateSC = debounce(updateSimpleClassifiers, 2000);
+const mSetupOptions = {
+  width: 1280,
+  height: 800,
+  noWalls: settings.appModules.wallsDisabled,
+  noRenderer: settings.appModules.internalCanvasDisabled
+};
+const MatterSetup = lampixPhysics;
+export const matterSetup = new MatterSetup(mSetupOptions);
 
 // Initializing everything with this function.
 init();
@@ -70,15 +56,13 @@ init();
 // Main application loop. Runs endlessly with requestAnimationFrame.
 function loop() {
   // Updating Lampix Physics as well, if enabled.
-  if (settings.appModules.physics) {
-    matterSetup.utils.updateMatterEngine();
-    matterObject.forEach((element, index) => {
-      if (element.body.position.y > ch) {
-        matterSetup.utils.deleteBody(element);
-        matterObject.splice(index, 1);
-      }
-    });
-  }
+  matterSetup.utils.updateMatterEngine();
+  matterObject.forEach((element, index) => {
+    if (element.body.position.y > ch) {
+      matterSetup.utils.deleteBody(element);
+      matterObject.splice(index, 1);
+    }
+  });
   window.requestAnimationFrame(loop);
 }
 
@@ -88,6 +72,8 @@ window.onload = loop;
 // Initializing the app.
 export function init() {
   if (lampixCore) {
+    registerDOMSimpleClassifiers();
+    depthClassifier();
     // let lastRandom;
     // Events.on(matterSetup.engine, 'collisionStart', (event) => {
     //   const { pairs } = event;
@@ -152,89 +138,130 @@ export function init() {
     );
     message.setAttribute('id', 'how-to-start');
     document.body.appendChild(message);
-    message.innerHTML = 'Place a capsule';
+    message.innerHTML = 'Place an object';
 
-    lampixCore.registerPositionClassifier(
-      [{
-        posX: 0, posY: 0, width: 1280, height: 800, classifier: classifierString
-      }],
-      // Identification callback.
-      (rectIndex, outlines) => {
-        document.createElement('div');
-        const element = document.createElement('div');
-        element.setAttribute('style', 'position: relative; left: 0; top: 0; width: auto; color: #aaa');
-        document.body.appendChild(element);
-        const classification = outlines[0];
-        // outlines.forEach(classification => {
-        // const id = classification.objectId;
-        const id = 1;
-        if (!classification.classTag) {
-          element.innerHTML = '-';
-          matterSetup.utils.deleteBody(placedObject.get(id).obj);
-          placedObject.delete(id);
-          if (placedObject.size === 0) {
-            document.getElementById('how-to-start').style.display = 'block';
-            firstObjectDetected = false;
-            placedObject.set(-1, { x: randomInt(cw / 2 - 30, cw / 2 + 30) });
+    // lampixCore.registerPositionClassifier(
+    //   [{
+    //     posX: 0, posY: 0, width: 1280, height: 800, classifier: 'classifierString'
+    //   }],
+    //   // Identification callback.
+    //   (rectIndex, outlines) => {
+    //     document.createElement('div');
+    //     const element = document.createElement('div');
+    //     element.setAttribute('style', 'position: relative; left: 0; top: 0; width: auto; color: #aaa');
+    //     document.body.appendChild(element);
+    //     const classification = outlines[0];
+    //     // outlines.forEach(classification => {
+    //     // const id = classification.objectId;
+    //     const id = 1;
+    //     if (!classification.classTag) {
+    //       element.innerHTML = '-';
+    //       matterSetup.utils.deleteBody(placedObject.get(id).obj);
+    //       placedObject.delete(id);
+    //       if (placedObject.size === 0) {
+    //         document.getElementById('how-to-start').style.display = 'block';
+    //         firstObjectDetected = false;
+    //         placedObject.set(-1, { x: randomInt(cw / 2 - 30, cw / 2 + 30) });
+    //       }
+    //     } else {
+    //       const diffX = 400;
+    //       const diffY = 250;
+    //       const cx = classification.centerPoint.posX - diffX;
+    //       const cy = classification.centerPoint.posY - diffY;
+    //       // placedObject.set(id, { obj: staticObject(cx, cy, 30), x: cx });
+    //       placedObject.set(id, { obj: createObjectFromVertices(cx, cy, classification.outline.points), x: cx });
+    //       if (placedObject.get(id)) {
+    //         matterSetup.Matter.World.remove(matterSetup.world, placedObject.get(id).obj);
+    //       }
+    //       const { points } = classification.outline;
+    //       const result = points.length > 100 ? [] : [{ x: 60, y: 0 }, { x: 120, y: 60 }, { x: 0, y: 120 }];
+    //       points.forEach((point, index) => {
+    //         if ((index + 1) % 100 === 0) {
+    //           result.push({ x: Math.round(point.posX - diffX), y: Math.round(point.posY - diffY) });
+    //         }
+    //       });
+    //       // placedObject.set(id, { obj: createObjectFromVertices(cx, cy, result), x: cx });
+    //       const theOptions = {
+    //         x: cx,
+    //         y: cy,
+    //         vertices: result,
+    //         matterOptions: {
+    //           isStatic: true,
+    //           collisionFilter: {
+    //             category: 0x0002
+    //           }
+    //         }
+    //       };
+    //       placedObject.set(id, { obj: matterSetup.utils.createIrregular(theOptions), x: cx });
+    //       element.innerHTML = '+';
+    //       if (!firstObjectDetected) {
+    //         firstObjectDetected = true;
+    //         placedObject.delete(-1);
+    //         document.getElementById('how-to-start').style.display = 'none';
+    //       }
+    //     }
+    //     // });
+    //   },
+    // );
+  }
+}
+
+function depthClassifier() {
+  const promise = new Promise(resolve => {
+    const watcher = {
+      type: 'segmenter',
+      name: 'DepthClassifier',
+      shape: lampixCore.helpers.rectangle(0, 0, 1280, 800),
+      params: {},
+      onClassification: (detectedObjects) => {
+        detectedObjects.forEach((obj) => {
+          const { posX, posY } = obj.centerPoint;
+          const { objectId } = obj;
+          if (placedObject.get(objectId)) {
+            matterSetup.Matter.World.remove(matterSetup.world, placedObject.get(objectId).obj);
           }
-        } else {
-          const diffX = 400;
-          const diffY = 250;
-          const cx = classification.centerPoint.posX - diffX;
-          const cy = classification.centerPoint.posY - diffY;
-          // placedObject.set(id, { obj: staticObject(cx, cy, 30), x: cx });
-          // placedObject.set(id, { obj: createObjectFromVertices(cx, cy, classification.outline.points), x: cx });
-          if (placedObject.get(id)) {
-            matterSetup.Matter.World.remove(matterSetup.world, placedObject.get(id).obj);
-          }
-          const { points } = classification.outline;
-          const result = points.length > 100 ? [] : [{ x: 60, y: 0 }, { x: 120, y: 60 }, { x: 0, y: 120 }];
-          points.forEach((point, index) => {
-            if ((index + 1) % 100 === 0) {
-              result.push({ x: Math.round(point.posX - diffX), y: Math.round(point.posY - diffY) });
-            }
+          const { points } = obj.outline;
+          const result = [];
+          points.forEach((point) => {
+            result.push({ x: point.posX, y: point.posY });
           });
-          // placedObject.set(id, { obj: createObjectFromVertices(cx, cy, result), x: cx });
-          const theOptions = {
-            x: cx,
-            y: cy,
-            vertices: result,
-            matterOptions: {
-              isStatic: true,
-              collisionFilter: {
-                category: 0x0002
-              }
-            }
-          };
-          placedObject.set(id, { obj: matterSetup.utils.createIrregular(theOptions), x: cx });
-          element.innerHTML = '+';
+          placedObject.set(objectId, { obj: createObjectFromVertices(posX, posY, result), x: posX });
+          // const theOptions = {
+          //   x: posX,
+          //   y: posY,
+          //   vertices: result,
+          //   matterOptions: {
+          //     isStatic: true,
+          //     collisionFilter: {
+          //       category: 0x0002
+          //     }
+          //   }
+          // };
+          // placedObject.set(objectId, { obj: matterSetup.utils.createIrregular(theOptions), x: posX });
           if (!firstObjectDetected) {
             firstObjectDetected = true;
             placedObject.delete(-1);
             document.getElementById('how-to-start').style.display = 'none';
           }
-        }
-        // });
+        });
       },
-    );
-  }
+      onLocation: () => console.log('onLocation')
+    };
+    lampixCore.watchers.add(watcher).then(([result]) => resolve(result));
+  });
+  return promise;
 }
 
-// function createObjectFromVertices(cx, cy, outlines) {
-//   const obj = Bodies.fromVertices(cx, cy, outlines, {
-//     isStatic: true,
-//     collisionFilter: {
-//       category: 0x0002
-//     },
-//     render: {
-//       fillStyle: '#444',
-//       opacity: 0.4,
-//       lineWidth: 0,
-//     }
-//   }, true);
-//   World.add(matterSetup.engine.world, obj);
-//   return obj;
-// }
+function createObjectFromVertices(cx, cy, outlines) {
+  const obj = Bodies.fromVertices(cx, cy, outlines, {
+    isStatic: true,
+    collisionFilter: {
+      category: 0x0002
+    }
+  }, true);
+  World.add(matterSetup.engine.world, obj);
+  return obj;
+}
 
 // function staticObject(x, y, r) {
 //   const options = {
@@ -269,6 +296,30 @@ export function init() {
 //     });
 // }
 // loadSVG();
+
+function registerDOMSimpleClassifiers() {
+  const closeApp = document.getElementById('close-app');
+  closeApp.style.opacity = 1;
+  createSimpleClassifier(closeApp, 'closeApp', true);
+}
+
+function createSimpleClassifier(button) {
+  const box = button.getBoundingClientRect();
+  lampixCore.watchers.add({
+    type: 'classifier',
+    name: 'NeuralNetworkClassifier',
+    shape: lampixCore.helpers.rectangle(box.left, box.top, box.width, box.height),
+    params: {
+      neural_network_name: 'cls_loc_fin_all_small'
+    },
+    onClassification: (result) => {
+      if (parseInt(result, 10)) {
+        lampixCore.switchToApp('app-switcher');
+      }
+    }
+  });
+}
+
 
 matterSetup.world.gravity = { x: 0, y: 0.5 };
 randomParticle();
