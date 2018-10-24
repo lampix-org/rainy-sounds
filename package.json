@@ -16,11 +16,12 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@lampix/core": "^0.4.2",
-    "@lampix/physics": "^0.1.11",
+    "@lampix/core": "^1.0.0-alpha.9",
+    "@lampix/physics": "^0.2.0",
     "animejs": "^2.2.0",
     "lodash.debounce": "^4.0.8",
-    "matter-js": "^0.14.2"
+    "matter-js": "^0.14.2",
+    "poly-decomp": "^0.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.54",
