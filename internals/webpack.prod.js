@@ -3,8 +3,6 @@ const path = require('path');
 const baseConfig = require('./webpack.base');
 const vendors = require('./vendors.json');
 
-require('dotenv').config();
-
 const cwd = process.cwd();
 
 // Plugins
@@ -30,13 +28,9 @@ module.exports = baseConfig({
           use: [
             {
               loader: 'css-loader',
-              options: Object.assign({
+              options: {
                 minimize: true
-              }, process.env.CSS_MODULES_ENABLED ? {
-                modules: true,
-                localIdentName: '[name]__[local]__[hash:base64:5]',
-                camelCase: true
-              } : {}),
+              },
             },
             {
               loader: 'sass-loader'
