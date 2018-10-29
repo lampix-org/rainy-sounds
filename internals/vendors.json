@@ -1,4 +1,3 @@
 [
-  "@lampix/core",
-  "@lampix/state"
+  "@lampix/core"
 ]
