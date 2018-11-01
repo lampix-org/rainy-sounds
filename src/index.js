@@ -145,7 +145,6 @@ export function init() {
 function depthClassifier() {
   const promise = new Promise(resolve => {
     const watcher = {
-      type: 'segmenter',
       name: 'DepthClassifier',
       shape: lampixCore.helpers.rectangle(0, 0, 1280, 800),
       params: {},
@@ -242,14 +241,13 @@ function registerDOMSimpleClassifiers() {
 function createSimpleClassifier(button) {
   const box = button.getBoundingClientRect();
   lampixCore.watchers.add({
-    type: 'classifier',
     name: 'NeuralNetworkClassifier',
     shape: lampixCore.helpers.rectangle(box.left, box.top, box.width, box.height),
     params: {
-      neural_network_name: 'cls_loc_fin_all_small'
+      neural_network_name: 'fingers'
     },
-    onClassification: (result) => {
-      if (parseInt(result, 10)) {
+    onClassification: ([recognizedObject]) => {
+      if (parseInt(recognizedObject.classTag, 10)) {
         lampixCore.switchToApp('app-switcher');
       }
     }
