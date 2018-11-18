@@ -48,7 +48,7 @@ With the above in mind, get started developing by running `npm start` and going 
 ## Contributing
 
 Open an issue first to discuss potential changes/additions.  
-We'd like to the `master` branch minimal, but we can definitely have branches specific for environments using SASS, LESS, Stylus, JSX, TypeScript etc.
+We'd like to keep the `master` branch minimal, but we can definitely have branches specific for environments using SASS, LESS, Stylus, JSX, TypeScript etc.
 
 **[Back to top](#table-of-contents)**
 
