@@ -20,7 +20,7 @@ const optionalFileRules = optionalFilesCopyRules([
 module.exports = () => ({
   mode: 'production',
   output: {
-    filename: '[name].[contenthash].js',
+    filename: '[name].[hash].js',
     path: joinToDist()
   },
   entry: {
@@ -106,8 +106,8 @@ module.exports = () => ({
   plugins: [
     new CleanPlugin([joinToDist()], { root: joinToCwd(), }),
     new MiniCssExtractPlugin({
-      filename: '[name].[contenthash].css',
-      chunkFilename: '[id].[contenthash].css',
+      filename: '[name].[hash].css',
+      chunkFilename: '[id].[hash].css',
     }),
     new HtmlWebpackPlugin({
       template: joinToCwd('src', 'index.html')
