@@ -1,9 +1,10 @@
-const webpack = require('webpack');
 const path = require('path');
 
 const cwd = process.cwd();
 
 module.exports = (options) => ({
+  mode: options.mode,
+  optimization: options.optimization,
   entry: Object.assign({
     app: path.join(cwd, 'src', 'index.js')
   }, options.entry),
@@ -16,31 +17,6 @@ module.exports = (options) => ({
         use: {
           loader: 'babel-loader'
         }
-      },
-      {
-        test: /\.(jpe?g|png|gif|svg)$/i,
-        use: [
-          { loader: 'file-loader?name=[name].[ext]' },
-          {
-            loader: 'image-webpack-loader',
-            options: {
-              bypassOnDebug: true,
-              pngquant: {
-                quality: '65-90',
-                speed: 4
-              },
-              optipng: {
-                optimizationLevel: 7
-              },
-              mozjpeg: {
-                progressive: true
-              },
-              gifsicle: {
-                interlaced: false
-              }
-            }
-          }
-        ]
       },
       {
         test: /\.(eot|svg|ttf|woff|woff2)$/,
@@ -58,9 +34,6 @@ module.exports = (options) => ({
       'node_modules'
     ]
   }, options.resolve),
-  plugins: options.plugins.concat([
-    new webpack.LoaderOptionsPlugin({
-      debug: true
-    })
-  ])
+  plugins: options.plugins.concat([]),
+  devServer: options.devServer
 });

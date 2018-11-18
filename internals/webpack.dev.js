@@ -7,6 +7,7 @@ const cwd = process.cwd();
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = baseConfig({
+  mode: 'development',
   output: {
     filename: 'app.js'
   },
@@ -16,13 +17,13 @@ module.exports = baseConfig({
         test: /\.s?css$/,
         use: [
           'style-loader',
-          {
-            loader: 'css-loader'
-          },
-          {
-            loader: 'sass-loader'
-          }
-        ]
+          'css-loader',
+          'sass-loader'
+        ],
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        loader: 'file-loader?name=[name].[ext]'
       }
     ]
   },
@@ -33,5 +34,8 @@ module.exports = baseConfig({
     new HtmlWebpackPlugin({
       template: path.join(cwd, 'src', 'index.html')
     })
-  ]
+  ],
+  devServer: {
+    port: process.env.PORT
+  }
 });

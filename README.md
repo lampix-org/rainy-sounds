@@ -16,15 +16,12 @@ It does not assume the technologies that will be used.
 `cd lampix-app-starter`  
 `npm install`
 
-If you're not improving the boilerplate, but rather starting a new app, go ahead and remove the `.git` folder.
+If you're not improving the boilerplate, but rather starting a new app: 
+
+- if you want to update with changes from upstream: `git remote add upstream git@github.com:lampix-org/app-boilerplate.git`, and `git remote set-url origin <your-remote>`
+- if you don't care about upstream, either remove the `.git` folder completely or run `git remote set-url origin <your-remote>`, overwriting the connection to upstream with your own
 
 ### Features
-
-### CSS Modules
-
-This helps with keeping CSS maintainable as you'll be writing CSS for specific components, while avoiding name collisions automatically.
-By default, CSS modules are disabled. You can enable them by adding a `.env` file at the root of the project and specifying `CSS_MODULES_ENABLED=1`.
-
 
 ### HMR
 
