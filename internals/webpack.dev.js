@@ -6,12 +6,9 @@ const CopyPlugin = require('copy-webpack-plugin');
 const { optionalFilesCopyRules } = require('./optionalFilesCopyRules');
 const { joinToCwd } = require('./joinToUtils');
 
-const optionalFileRules = optionalFilesCopyRules(
-  [
-    joinToCwd('config.json')
-  ],
-  ''
-);
+const optionalFileRules = optionalFilesCopyRules([
+  joinToCwd('config.json')
+]);
 
 module.exports = () => ({
   mode: 'development',

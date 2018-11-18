@@ -1,14 +1,18 @@
+const path = require('path');
 const fs = require('fs');
 
-const { joinToDist } = require('./joinToUtils');
-
-const optionalFilesCopyRules = (pathsToCheck, outputPath) => {
+const optionalFilesCopyRules = (filenames, {
+  root,
+  outputPath
+} = {
+  root: process.cwd(),
+  outputPath: ''
+}) => {
   const rules = [];
-  const output = outputPath != null ? outputPath : joinToDist();
 
-  pathsToCheck.forEach((pathToCheck) => {
-    if (fs.existsSync(pathToCheck)) {
-      rules.push({ from: pathToCheck, to: output });
+  filenames.forEach((filename) => {
+    if (fs.existsSync(filename)) {
+      rules.push({ from: path.join(root, filename), to: outputPath });
     }
   });
 

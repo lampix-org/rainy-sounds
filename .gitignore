@@ -1,6 +1,7 @@
 .env
 node_modules/
 dist/
+dist-*/
 **/*.css.d.ts
 
 # Created by https://www.gitignore.io/api/webstorm,visualstudiocode

@@ -10,7 +10,9 @@ const { optionalFilesCopyRules } = require('./optionalFilesCopyRules');
 const optionalFileRules = optionalFilesCopyRules([
   joinToCwd('config.json'),
   joinToCwd('schema.json')
-]);
+], {
+  outputPath: joinToDist()
+});
 
 module.exports = () => ({
   mode: 'production',
@@ -92,7 +94,7 @@ module.exports = () => ({
       NODE_ENV: 'production'
     }),
     new CopyPlugin([
-      { from: joinToCwd('package.json'), to: joinToDist() }
+      { from: joinToCwd('package.json'), to: joinToDist('package.json') }
     ].concat(optionalFileRules))
   ],
   optimization: {
