@@ -12,8 +12,8 @@ It does not assume the technologies that will be used.
 
 ## Installation
 
-`git clone --depth=1 git@gitlab.rosoftlab.net:lampix/lampix-app-starter.git`  
-`cd lampix-app-starter`  
+`git clone --depth=1 git@gitlab.rosoftlab.net:lampix/lampix-app-starter.git yourapp`  
+`cd yourapp`  
 `npm install`
 
 If you're not improving the boilerplate, but rather starting a new app: 
