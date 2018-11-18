@@ -3,9 +3,12 @@ const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const CopyPlugin = require('copy-webpack-plugin');
+const ZipPlugin = require('zip-webpack-plugin');
+const CleanPlugin = require('clean-webpack-plugin');
 
 const { joinToCwd, joinToDist } = require('./joinToUtils');
 const { optionalFilesCopyRules } = require('./optionalFilesCopyRules');
+const pkg = require('../package.json');
 
 const optionalFileRules = optionalFilesCopyRules([
   joinToCwd('config.json'),
@@ -17,7 +20,7 @@ const optionalFileRules = optionalFilesCopyRules([
 module.exports = () => ({
   mode: 'production',
   output: {
-    filename: '[name].js',
+    filename: '[name].[contenthash].js',
     path: joinToDist()
   },
   entry: {
@@ -81,22 +84,6 @@ module.exports = () => ({
       'node_modules'
     ]
   },
-  plugins: [
-    new MiniCssExtractPlugin({
-      filename: '[name].[hash].css',
-      chunkFilename: '[id].[hash].css',
-    }),
-    // Extract app code to own file
-    new HtmlWebpackPlugin({
-      template: joinToCwd('src', 'index.html')
-    }),
-    new webpack.EnvironmentPlugin({
-      NODE_ENV: 'production'
-    }),
-    new CopyPlugin([
-      { from: joinToCwd('package.json'), to: joinToDist('package.json') }
-    ].concat(optionalFileRules))
-  ],
   optimization: {
     splitChunks: {
       cacheGroups: {
@@ -115,5 +102,24 @@ module.exports = () => ({
         }
       }
     }
-  }
+  },
+  plugins: [
+    new CleanPlugin([joinToDist()], { root: joinToCwd(), }),
+    new MiniCssExtractPlugin({
+      filename: '[name].[contenthash].css',
+      chunkFilename: '[id].[contenthash].css',
+    }),
+    new HtmlWebpackPlugin({
+      template: joinToCwd('src', 'index.html')
+    }),
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: 'production'
+    }),
+    new CopyPlugin([
+      { from: joinToCwd('package.json'), to: joinToDist('package.json') }
+    ].concat(optionalFileRules)),
+    new ZipPlugin({
+      filename: `${pkg.name}-v${pkg.version}.zip`
+    })
+  ]
 });
