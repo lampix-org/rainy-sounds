@@ -1,20 +1,25 @@
 const webpack = require('webpack');
-const path = require('path');
-
-const cwd = process.cwd();
-
 // Plugins
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+
+const { joinToCwd, joinToDist } = require('./joinToUtils');
+const { optionalFilesCopyRules } = require('./optionalFilesCopyRules');
+
+const optionalFileRules = optionalFilesCopyRules([
+  joinToCwd('config.json'),
+  joinToCwd('schema.json')
+]);
 
 module.exports = () => ({
   mode: 'production',
   output: {
     filename: '[name].js',
-    path: path.join(cwd, 'dist')
+    path: joinToDist()
   },
   entry: {
-    app: path.join(cwd, 'src', 'index.js')
+    app: joinToCwd('src', 'index.js')
   },
   module: {
     rules: [
@@ -81,11 +86,14 @@ module.exports = () => ({
     }),
     // Extract app code to own file
     new HtmlWebpackPlugin({
-      template: path.join(cwd, 'src', 'index.html')
+      template: joinToCwd('src', 'index.html')
     }),
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'production'
-    })
+    }),
+    new CopyPlugin([
+      { from: joinToCwd('package.json'), to: joinToDist() }
+    ].concat(optionalFileRules))
   ],
   optimization: {
     splitChunks: {
@@ -94,7 +102,7 @@ module.exports = () => ({
           chunks: 'initial',
           minChunks: 2,
           maxInitialRequests: 5, // The default limit is too small to showcase the effect
-          minSize: 0 // This is example is too small to create commons chunks
+          minSize: 0
         },
         vendor: {
           test: /node_modules/,

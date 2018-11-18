@@ -1,10 +1,17 @@
 const webpack = require('webpack');
-const path = require('path');
-
-const cwd = process.cwd();
-
 // Plugins
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+
+const { optionalFilesCopyRules } = require('./optionalFilesCopyRules');
+const { joinToCwd } = require('./joinToUtils');
+
+const optionalFileRules = optionalFilesCopyRules(
+  [
+    joinToCwd('config.json')
+  ],
+  ''
+);
 
 module.exports = () => ({
   mode: 'development',
@@ -51,11 +58,14 @@ module.exports = () => ({
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(cwd, 'src', 'index.html')
+      template: joinToCwd('src', 'index.html')
     }),
     new webpack.EnvironmentPlugin({
       NODE_ENV: 'development'
-    })
+    }),
+    new CopyPlugin([
+      { from: joinToCwd('package.json'), to: '' }
+    ].concat(optionalFileRules))
   ],
   devServer: {
     port: process.env.PORT

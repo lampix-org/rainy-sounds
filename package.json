@@ -1,8 +1,16 @@
 {
   "name": "lampix-app-starter",
+  "displayName": "Lampix App Starter",
   "version": "1.0.0",
   "description": "Boilerplate for starting Lampix apps",
-  "main": "index.js",
+  "author": {
+    "email": "your@email.com",
+    "name": "Your name"
+  },
+  "lampixConfig": {
+    "lampixVersion": ">= 2.0.0",
+    "showInAppSwitcher": true
+  },
   "scripts": {
     "build": "webpack --config internals/webpack.prod.js --progress --colors",
     "start": "webpack-dev-server -d --inline --hot --config internals/webpack.dev.js",
@@ -26,6 +34,7 @@
     "babel-eslint": "^8.2.6",
     "babel-loader": "^8.0.4",
     "clean-webpack-plugin": "^1.0.0",
+    "copy-webpack-plugin": "^4.6.0",
     "css-loader": "^1.0.1",
     "eslint": "^4.19.1",
     "eslint-config-airbnb-base": "^12.1.0",
