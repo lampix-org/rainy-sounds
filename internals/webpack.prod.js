@@ -1,6 +1,5 @@
 const webpack = require('webpack');
 const path = require('path');
-const baseConfig = require('./webpack.base');
 
 const cwd = process.cwd();
 
@@ -8,14 +7,32 @@ const cwd = process.cwd();
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
-module.exports = baseConfig({
+module.exports = () => ({
   mode: 'production',
   output: {
     filename: '[name].js',
     path: path.join(cwd, 'dist')
   },
+  entry: {
+    app: path.join(cwd, 'src', 'index.js')
+  },
   module: {
     rules: [
+      {
+        test: /\.js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader'
+        }
+      },
+      {
+        test: /\.(eot|svg|ttf|woff|woff2)$/,
+        loader: 'file-loader?name=[name].[ext]'
+      },
+      {
+        test: /\.(mp4|webm|ogv)$/,
+        loader: 'file-loader?name=[name].[ext]'
+      },
       {
         test: /\.s?css$/,
         use: [
@@ -50,6 +67,13 @@ module.exports = baseConfig({
       }
     ]
   },
+  resolve: {
+    symlinks: false,
+    modules: [
+      'src',
+      'node_modules'
+    ]
+  },
   plugins: [
     new MiniCssExtractPlugin({
       filename: '[name].[hash].css',
@@ -60,7 +84,7 @@ module.exports = baseConfig({
       template: path.join(cwd, 'src', 'index.html')
     }),
     new webpack.EnvironmentPlugin({
-      DEBUG_PROD: process.env.DEBUG_PROD || 'false'
+      NODE_ENV: 'production'
     })
   ],
   optimization: {

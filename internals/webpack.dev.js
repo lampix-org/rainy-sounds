@@ -1,18 +1,33 @@
+const webpack = require('webpack');
 const path = require('path');
-const baseConfig = require('./webpack.base');
 
 const cwd = process.cwd();
 
 // Plugins
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
-module.exports = baseConfig({
+module.exports = () => ({
   mode: 'development',
   output: {
     filename: 'app.js'
   },
   module: {
     rules: [
+      {
+        test: /\.js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader'
+        }
+      },
+      {
+        test: /\.(eot|svg|ttf|woff|woff2)$/,
+        loader: 'file-loader?name=[name].[ext]'
+      },
+      {
+        test: /\.(mp4|webm|ogv)$/,
+        loader: 'file-loader?name=[name].[ext]'
+      },
       {
         test: /\.s?css$/,
         use: [
@@ -28,11 +43,18 @@ module.exports = baseConfig({
     ]
   },
   resolve: {
-    symlinks: false
+    symlinks: false,
+    modules: [
+      'src',
+      'node_modules'
+    ]
   },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.join(cwd, 'src', 'index.html')
+    }),
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: 'development'
     })
   ],
   devServer: {
