@@ -16,6 +16,7 @@
     "build:version:patch": "npm version patch && npm run build",
     "build:version:minor": "npm version minor && npm run build",
     "build:version:major": "npm version major && npm run build",
+    "bundle:stats": "webpack --config internals/webpack.prod.js --profile --json > bundleStats.json",
     "start": "webpack-dev-server -d --inline --hot --config internals/webpack.dev.js",
     "precommit": "lint-staged"
   },

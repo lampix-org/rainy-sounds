@@ -3,6 +3,7 @@ node_modules/
 dist/
 dist-*/
 **/*.css.d.ts
+bundleStats.json
 
 # Created by https://www.gitignore.io/api/webstorm,visualstudiocode
 
