@@ -1,4 +1,4 @@
-import { World, Bodies } from 'matter-js';
+import { World, Bodies, Events } from 'matter-js';
 import lampixCore from '@lampix/core';
 import lampixPhysics from '@lampix/physics';
 import settings from './settings/datastructure';
@@ -6,25 +6,25 @@ import style from './css/style.css';
 import './utils/pathseg';
 import randomInt from './utils/randomInt';
 
-// import audio1 from './assets/musical_notes/major/1.ogg';
-// import audio2 from './assets/musical_notes/major/2.ogg';
-// import audio3 from './assets/musical_notes/major/3.ogg';
-// import audio4 from './assets/musical_notes/major/4.ogg';
-// import audio5 from './assets/musical_notes/major/5.ogg';
-// import audio6 from './assets/musical_notes/major/6.ogg';
-// import audio7 from './assets/musical_notes/major/7.ogg';
-// import audio8 from './assets/musical_notes/major/8.ogg';
+import audio1 from './assets/musical_notes/major/1.ogg';
+import audio2 from './assets/musical_notes/major/2.ogg';
+import audio3 from './assets/musical_notes/major/3.ogg';
+import audio4 from './assets/musical_notes/major/4.ogg';
+import audio5 from './assets/musical_notes/major/5.ogg';
+import audio6 from './assets/musical_notes/major/6.ogg';
+import audio7 from './assets/musical_notes/major/7.ogg';
+import audio8 from './assets/musical_notes/major/8.ogg';
 
-// const audioList = [
-//   audio1,
-//   audio2,
-//   audio3,
-//   audio4,
-//   audio5,
-//   audio6,
-//   audio7,
-//   audio8
-// ];
+const audioList = [
+  audio1,
+  audio2,
+  audio3,
+  audio4,
+  audio5,
+  audio6,
+  audio7,
+  audio8
+];
 
 export default style;
 
@@ -33,12 +33,14 @@ global.decomp = require('poly-decomp');
 // Full screen dimensions.
 export const cw = window.innerWidth;
 export const ch = window.innerHeight;
-let firstObjectDetected = false;
 const matterObject = [];
-const placedObject = new Map();
+const placedObject = {};
+// const addedToList = [];
+// const removedFromList = [];
 // const vertexSets = [];
+const initialObjectOnSet = { x: randomInt(cw / 2 - 30, cw / 2 + 30) };
+placedObject.initial = initialObjectOnSet;
 
-placedObject.set(-1, { x: randomInt(cw / 2 - 30, cw / 2 + 30) });
 let refreshRate = 300;
 
 const mSetupOptions = {
@@ -74,22 +76,22 @@ export function init() {
   if (lampixCore) {
     registerDOMSimpleClassifiers();
     depthClassifier();
-    // let lastRandom;
-    // Events.on(matterSetup.engine, 'collisionStart', (event) => {
-    //   const { pairs } = event;
-    //   if (pairs[0] && !pairs[0].touched) {
-    //     pairs[0].touched = true;
-    //     let randomNr = Math.floor(randomInt(0, audioList.length));
-    //     while (randomNr === lastRandom) {
-    //       randomNr = Math.floor(randomInt(0, audioList.length));
-    //     }
-    //     lastRandom = randomNr;
+    let lastRandom;
+    Events.on(matterSetup.engine, 'collisionStart', (event) => {
+      const { pairs } = event;
+      if (pairs[0] && !pairs[0].touched) {
+        pairs[0].touched = true;
+        let randomNr = Math.floor(randomInt(0, audioList.length));
+        while (randomNr === lastRandom) {
+          randomNr = Math.floor(randomInt(0, audioList.length));
+        }
+        lastRandom = randomNr;
 
-    //     const sound = new Audio(audioList[randomNr]);
-    //     sound.volume = 1;
-    //     sound.play();
-    //   }
-    // });
+        const sound = new Audio(audioList[randomNr]);
+        sound.volume = 0;
+        sound.play();
+      }
+    });
 
     const refreshRateOnScreen = document.createElement('div');
     refreshRateOnScreen.setAttribute(
@@ -97,14 +99,14 @@ export function init() {
       `font-family: Helvetica;
        font-size: 14px;
        position: absolute;
-       left: 0;
+       left: 50px;
        width: auto;
        top: 0;
        color: #ccc;`
     );
     refreshRateOnScreen.setAttribute('id', 'refresh-rate');
     document.body.appendChild(refreshRateOnScreen);
-    refreshRateOnScreen.innerHTML = `refresh rate: ${refreshRate / 1000}s`;
+    // refreshRateOnScreen.innerHTML = `refresh rate: ${refreshRate / 1000}s`;
 
     document.body.addEventListener('keypress', (ev) => {
       if (ev.key === 'w') {
@@ -149,18 +151,41 @@ function depthClassifier() {
       shape: lampixCore.helpers.rectangle(0, 0, 1280, 800),
       params: {},
       onClassification: (detectedObjects) => {
+        // document.getElementById('refresh-rate').innerHTML = '';
+        // const idList = detectedObjects.map(e => e.objectId);
+        // document.getElementById('refresh-rate').innerHTML = `<br/><br/><br/><br/><br/>
+        //     detected objects: [${idList.join(',')}]
+        //     <br/><br/>`;
         detectedObjects.forEach((obj) => {
           const { posX, posY } = obj.centerPoint;
           const { objectId } = obj;
-          if (placedObject.get(objectId)) {
-            matterSetup.Matter.World.remove(matterSetup.world, placedObject.get(objectId).obj);
+          if (placedObject[objectId]) {
+            // removedFromList.push(objectId);
+            // document.body.removeChild(document.getElementById(objectId));
+            matterSetup.Matter.World.remove(matterSetup.world, placedObject[objectId].obj);
+            delete placedObject[objectId];
+          } else if (obj.outline && obj.outline.points.length) {
+            const { points } = obj.outline;
+            const result = [];
+            points.forEach(point => {
+              result.push({ x: point.posX, y: point.posY });
+            });
+            placedObject[objectId] = { obj: createObjectFromVertices(posX, posY, result), x: posX };
+            // addedToList.push(objectId);
+
+            if (placedObject.initial) {
+              delete placedObject.initial;
+              document.getElementById('how-to-start').style.display = 'none';
+            }
+
+            // createHTMLElement(objectId, posX, posY);
           }
-          const { points } = obj.outline;
-          const result = [];
-          points.forEach((point) => {
-            result.push({ x: point.posX, y: point.posY });
-          });
-          placedObject.set(objectId, { obj: createObjectFromVertices(posX, posY, result), x: posX });
+          if (Object.keys(placedObject).length === 0) {
+            placedObject.initial = initialObjectOnSet;
+            document.getElementById('how-to-start').style.display = 'block';
+          }
+          // document.getElementById('refresh-rate').innerHTML += `added:   [${addedToList.join(',')}]<br/><br/>`;
+          // document.getElementById('refresh-rate').innerHTML += `removed: [${removedFromList.join(',')}]<br/>`;
           // const theOptions = {
           //   x: posX,
           //   y: posY,
@@ -173,14 +198,8 @@ function depthClassifier() {
           //   }
           // };
           // placedObject.set(objectId, { obj: matterSetup.utils.createIrregular(theOptions), x: posX });
-          if (!firstObjectDetected) {
-            firstObjectDetected = true;
-            placedObject.delete(-1);
-            document.getElementById('how-to-start').style.display = 'none';
-          }
         });
-      },
-      onLocation: () => console.log('onLocation')
+      }
     };
     lampixCore.watchers.add(watcher).then(([result]) => resolve(result));
   });
@@ -192,11 +211,30 @@ function createObjectFromVertices(cx, cy, outlines) {
     isStatic: true,
     collisionFilter: {
       category: 0x0002
-    }
+    },
+    // angle: 0.2 * (Math.PI / 180)
   }, true);
   World.add(matterSetup.engine.world, obj);
   return obj;
 }
+
+// function createHTMLElement(id, cx, cy) {
+//   const el = document.createElement('div');
+//   el.setAttribute(
+//     'style',
+//     `font-family: Helvetica;
+//       font-size: 14px;
+//       position: absolute;
+//       left: ${cx}px;
+//       width: auto;
+//       top: ${cy}px;
+//       color: #ccc;
+//       z-index: 120;`
+//   );
+//   el.setAttribute('id', id);
+//   document.body.appendChild(el);
+//   el.innerHTML = id;
+// }
 
 // function staticObject(x, y, r) {
 //   const options = {
@@ -255,19 +293,19 @@ function createSimpleClassifier(button) {
 }
 
 
-matterSetup.world.gravity = { x: 0, y: 0.5 };
+matterSetup.world.gravity = { x: 0, y: 1.7 };
 randomParticle();
 function randomParticle() {
-  const keys = Array.from(placedObject.keys());
+  const keys = Object.keys(placedObject);
+  const randomKey = keys[Math.floor(randomInt(0, keys.length))];
   const options = {
-    x: placedObject.get(keys[Math.floor(randomInt(0, keys.length))]).x + 25 - randomInt(0, 50),
+    x: placedObject[randomKey].x + 25 - randomInt(0, 50),
     y: -randomInt(40, 200),
-    r: randomInt(8, 14),
+    r: randomInt(8, 18),
     matterOptions: {
       friction: 0,
-      frictionAir: randomInt(0.008, 0.03),
-      restitution: 0.7,
-      torque: 0,
+      frictionAir: randomInt(0.03, 0.07),
+      restitution: 0.4,
       collisionFilter: {
         mask: 0x0002
       },
