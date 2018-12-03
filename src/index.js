@@ -88,7 +88,7 @@ export function init() {
         lastRandom = randomNr;
 
         const sound = new Audio(audioList[randomNr]);
-        sound.volume = 0;
+        sound.volume = 0.6;
         sound.play();
       }
     });

@@ -3,6 +3,14 @@
   "version": "0.1.0",
   "description": "Demo app with physics and sounds",
   "main": "index.js",
+  "author": {
+    "email": "sneculae@lampix.com",
+    "name": "Sorin Neculae"
+  },
+  "lampixConfig": {
+    "lampixVersion": ">= 2.0.0",
+    "showInAppSwitcher": true
+  },
   "scripts": {
     "build": "webpack --config internals/webpack.prod.js --progress --colors",
     "start": "webpack-dev-server -d --inline --hot --config internals/webpack.dev.js",
