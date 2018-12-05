@@ -7,8 +7,11 @@ const { optionalFilesCopyRules } = require('./optionalFilesCopyRules');
 const { joinToCwd } = require('./joinToUtils');
 
 const optionalFileRules = optionalFilesCopyRules([
-  joinToCwd('config.json')
-]);
+  'config.json'
+], {
+  root: joinToCwd(),
+  outputPath: ''
+});
 
 module.exports = () => ({
   mode: 'development',

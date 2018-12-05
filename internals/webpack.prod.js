@@ -11,9 +11,10 @@ const { optionalFilesCopyRules } = require('./optionalFilesCopyRules');
 const pkg = require('../package.json');
 
 const optionalFileRules = optionalFilesCopyRules([
-  joinToCwd('config.json'),
-  joinToCwd('schema.json')
+  'config.json',
+  'schema.json'
 ], {
+  root: joinToCwd(),
   outputPath: joinToDist()
 });
 
