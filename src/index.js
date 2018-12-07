@@ -106,7 +106,6 @@ export function init() {
     );
     refreshRateOnScreen.setAttribute('id', 'refresh-rate');
     document.body.appendChild(refreshRateOnScreen);
-    // refreshRateOnScreen.innerHTML = `refresh rate: ${refreshRate / 1000}s`;
 
     document.body.addEventListener('keypress', (ev) => {
       if (ev.key === 'w') {
@@ -145,65 +144,42 @@ export function init() {
 }
 
 function depthClassifier() {
-  const promise = new Promise(resolve => {
-    const watcher = {
-      name: 'DepthClassifier',
-      shape: lampixCore.helpers.rectangle(0, 0, 1280, 800),
-      params: {},
-      onClassification: (detectedObjects) => {
-        // document.getElementById('refresh-rate').innerHTML = '';
-        // const idList = detectedObjects.map(e => e.objectId);
-        // document.getElementById('refresh-rate').innerHTML = `<br/><br/><br/><br/><br/>
-        //     detected objects: [${idList.join(',')}]
-        //     <br/><br/>`;
-        detectedObjects.forEach((obj) => {
-          const { posX, posY } = obj.centerPoint;
-          const { objectId } = obj;
-          if (placedObject[objectId]) {
-            // removedFromList.push(objectId);
-            // document.body.removeChild(document.getElementById(objectId));
-            matterSetup.Matter.World.remove(matterSetup.world, placedObject[objectId].obj);
-            delete placedObject[objectId];
-          } else if (obj.outline && obj.outline.points.length) {
-            const { points } = obj.outline;
-            const result = [];
-            points.forEach(point => {
-              result.push({ x: point.posX, y: point.posY });
-            });
-            placedObject[objectId] = { obj: createObjectFromVertices(posX, posY, result), x: posX };
-            // addedToList.push(objectId);
+  return lampixCore.getAppConfig()
+    .then((config) => {
+      const watcher = {
+        name: 'DepthClassifier',
+        shape: lampixCore.helpers.rectangle(0, 0, 1280, 800),
+        params: config.depthClassifierParams,
+        onClassification: (detectedObjects) => {
+          detectedObjects.forEach((obj) => {
+            const { posX, posY } = obj.centerPoint;
+            const { objectId } = obj;
+            if (placedObject[objectId]) {
+              matterSetup.Matter.World.remove(matterSetup.world, placedObject[objectId].obj);
+              delete placedObject[objectId];
+            } else if (obj.outline && obj.outline.points.length) {
+              const { points } = obj.outline;
+              const result = [];
+              points.forEach(point => {
+                result.push({ x: point.posX, y: point.posY });
+              });
+              placedObject[objectId] = { obj: createObjectFromVertices(posX, posY, result), x: posX };
 
-            if (placedObject.initial) {
-              delete placedObject.initial;
-              document.getElementById('how-to-start').style.display = 'none';
+              if (placedObject.initial) {
+                delete placedObject.initial;
+                document.getElementById('how-to-start').style.display = 'none';
+              }
             }
+            if (Object.keys(placedObject).length === 0) {
+              placedObject.initial = initialObjectOnSet;
+              document.getElementById('how-to-start').style.display = 'block';
+            }
+          });
+        }
+      };
 
-            // createHTMLElement(objectId, posX, posY);
-          }
-          if (Object.keys(placedObject).length === 0) {
-            placedObject.initial = initialObjectOnSet;
-            document.getElementById('how-to-start').style.display = 'block';
-          }
-          // document.getElementById('refresh-rate').innerHTML += `added:   [${addedToList.join(',')}]<br/><br/>`;
-          // document.getElementById('refresh-rate').innerHTML += `removed: [${removedFromList.join(',')}]<br/>`;
-          // const theOptions = {
-          //   x: posX,
-          //   y: posY,
-          //   vertices: result,
-          //   matterOptions: {
-          //     isStatic: true,
-          //     collisionFilter: {
-          //       category: 0x0002
-          //     }
-          //   }
-          // };
-          // placedObject.set(objectId, { obj: matterSetup.utils.createIrregular(theOptions), x: posX });
-        });
-      }
-    };
-    lampixCore.watchers.add(watcher).then(([result]) => resolve(result));
-  });
-  return promise;
+      return lampixCore.watchers.add(watcher).then(([result]) => result);
+    });
 }
 
 function createObjectFromVertices(cx, cy, outlines) {
@@ -217,58 +193,6 @@ function createObjectFromVertices(cx, cy, outlines) {
   World.add(matterSetup.engine.world, obj);
   return obj;
 }
-
-// function createHTMLElement(id, cx, cy) {
-//   const el = document.createElement('div');
-//   el.setAttribute(
-//     'style',
-//     `font-family: Helvetica;
-//       font-size: 14px;
-//       position: absolute;
-//       left: ${cx}px;
-//       width: auto;
-//       top: ${cy}px;
-//       color: #ccc;
-//       z-index: 120;`
-//   );
-//   el.setAttribute('id', id);
-//   document.body.appendChild(el);
-//   el.innerHTML = id;
-// }
-
-// function staticObject(x, y, r) {
-//   const options = {
-//     x,
-//     y,
-//     sides: randomInt(3, 5),
-//     r,
-//     matterOptions: {
-//       isStatic: true,
-//       collisionFilter: {
-//         category: 0x0002
-//       },
-//       render: {
-//         fillStyle: 'rgba(255, 0, 255, 0)',
-//         lineWidth: 0
-//       }
-//     }
-//   };
-//   return matterSetup.utils.createCircular(options);
-// }
-
-// function loadSVG() {
-//   fetch('./src/assets/Falling_for_fall_7501.svg')
-//     .then(response => response.text())
-//     .then(svg => {
-//       const tempHTML = document.createElement('div');
-//       tempHTML.innerHTML = svg;
-//       Array.from(tempHTML.getElementsByTagName('path')).forEach(path => {
-//         vertexSets.push(Svg.pathToVertices(path, 30));
-//       });
-//       setTimeout(matterTest, refreshRate);
-//     });
-// }
-// loadSVG();
 
 function registerDOMSimpleClassifiers() {
   const closeApp = document.getElementById('close-app');
