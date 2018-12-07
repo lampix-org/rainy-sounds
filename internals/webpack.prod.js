@@ -1,73 +1,126 @@
 const webpack = require('webpack');
-const path = require('path');
-const baseConfig = require('./webpack.base');
-const vendors = require('./vendors.json');
-
-require('dotenv').config();
-
-const cwd = process.cwd();
-
 // Plugins
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
+const ZipPlugin = require('zip-webpack-plugin');
+const CleanPlugin = require('clean-webpack-plugin');
 
-module.exports = baseConfig({
-  entry: {
-    vendor: vendors
-  },
+const { joinToCwd, joinToDist } = require('./joinToUtils');
+const { optionalFilesCopyRules } = require('./optionalFilesCopyRules');
+const pkg = require('../package.json');
+
+const optionalFileRules = optionalFilesCopyRules([
+  'config.json',
+  'schema.json'
+], {
+  root: joinToCwd(),
+  outputPath: joinToDist()
+});
+
+module.exports = () => ({
+  mode: 'production',
   output: {
-    filename: 'app.[chunkhash].js',
-    path: path.join(cwd, 'dist')
+    filename: '[name].[hash].js',
+    path: joinToDist()
+  },
+  entry: {
+    app: joinToCwd('src', 'index.js')
   },
   module: {
     rules: [
       {
+        test: /\.js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader'
+        }
+      },
+      {
+        test: /\.(eot|svg|ttf|woff|woff2|otf)$/,
+        loader: 'file-loader?name=[name].[ext]'
+      },
+      {
+        test: /\.(mp4|webm|ogv|ogg)$/,
+        loader: 'file-loader?name=[name].[ext]'
+      },
+      {
         test: /\.s?css$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: [
-            {
-              loader: 'css-loader',
-              options: Object.assign({
-                minimize: true
-              }, process.env.CSS_MODULES_ENABLED ? {
-                modules: true,
-                localIdentName: '[name]__[local]__[hash:base64:5]',
-                camelCase: true
-              } : {}),
-            },
-            {
-              loader: 'sass-loader'
+        use: [
+          MiniCssExtractPlugin.loader,
+          'css-loader',
+          'sass-loader'
+        ],
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        use: [
+          { loader: 'file-loader?name=[name].[ext]' },
+          {
+            loader: 'image-webpack-loader',
+            options: {
+              pngquant: {
+                quality: '65-90',
+                speed: 4
+              },
+              optipng: {
+                optimizationLevel: 7
+              },
+              mozjpeg: {
+                progressive: true
+              },
+              gifsicle: {
+                interlaced: false
+              }
             }
-          ]
-        })
+          }
+        ]
       }
     ]
   },
-  plugins: [
-    new CleanWebpackPlugin([path.join(cwd, 'dist')], { root: cwd }),
-    new ExtractTextPlugin({
-      filename: '[name].[chunkhash].css'
-    }),
-    // Extract vendor code to own file
-    new webpack.optimize.CommonsChunkPlugin({
-      name: 'vendor',
-      filename: '[name].[chunkhash].js',
-      minChunks: Infinity
-    }),
-    new UglifyJsPlugin({
-      test: /\.js($|\?)/i,
-      uglifyOptions: {
-        compress: {
-          warnings: false
+  resolve: {
+    symlinks: false,
+    modules: [
+      'src',
+      'node_modules'
+    ]
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          chunks: 'initial',
+          minChunks: 2,
+          maxInitialRequests: 5, // The default limit is too small to showcase the effect
+          minSize: 0
+        },
+        vendor: {
+          test: /node_modules/,
+          chunks: 'initial',
+          name: 'vendor',
+          priority: 10,
+          enforce: true
         }
       }
+    }
+  },
+  plugins: [
+    new CleanPlugin([joinToDist()], { root: joinToCwd(), }),
+    new MiniCssExtractPlugin({
+      filename: '[name].[hash].css',
+      chunkFilename: '[id].[hash].css',
     }),
-    // Extract app code to own file
     new HtmlWebpackPlugin({
-      template: path.join(cwd, 'src', 'index.html')
+      template: joinToCwd('src', 'index.html')
+    }),
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: 'production'
+    }),
+    new CopyPlugin([
+      { from: joinToCwd('package.json'), to: joinToDist('package.json') }
+    ].concat(optionalFileRules)),
+    new ZipPlugin({
+      filename: `${pkg.name}-v${pkg.version}.zip`
     })
   ]
 });

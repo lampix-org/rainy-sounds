@@ -1,43 +1,73 @@
-const path = require('path');
-const baseConfig = require('./webpack.base');
-require('dotenv').config();
-
-const cwd = process.cwd();
-
+const webpack = require('webpack');
 // Plugins
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require('copy-webpack-plugin');
 
-module.exports = baseConfig({
+const { optionalFilesCopyRules } = require('./optionalFilesCopyRules');
+const { joinToCwd } = require('./joinToUtils');
+
+const optionalFileRules = optionalFilesCopyRules([
+  'config.json'
+], {
+  root: joinToCwd(),
+  outputPath: ''
+});
+
+module.exports = () => ({
+  mode: 'development',
   output: {
     filename: 'app.js'
   },
   module: {
     rules: [
       {
+        test: /\.js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader'
+        }
+      },
+      {
+        test: /\.(eot|svg|ttf|woff|woff2|otf)$/,
+        loader: 'file-loader?name=[name].[ext]'
+      },
+      {
+        test: /\.(mp4|webm|ogv|ogg)$/,
+        loader: 'file-loader?name=[name].[ext]'
+      },
+      {
         test: /\.s?css$/,
         use: [
           'style-loader',
-          {
-            loader: 'css-loader',
-            options: process.env.CSS_MODULES_ENABLED ? {
-              modules: true,
-              localIdentName: '[name]__[local]__[hash:base64:5]',
-              camelCase: true
-            } : undefined
-          },
-          {
-            loader: 'sass-loader'
-          }
-        ]
+          'css-loader',
+          'sass-loader'
+        ],
+      },
+      {
+        test: /\.(jpe?g|png|gif|svg)$/i,
+        loader: 'file-loader?name=[name].[ext]'
       }
     ]
   },
   resolve: {
-    symlinks: false
+    symlinks: false,
+    modules: [
+      'src',
+      'node_modules'
+    ]
   },
   plugins: [
     new HtmlWebpackPlugin({
-      template: path.join(cwd, 'src', 'index.html')
-    })
-  ]
+      template: joinToCwd('src', 'index.html')
+    }),
+    new webpack.EnvironmentPlugin({
+      NODE_ENV: 'development'
+    }),
+    new CopyPlugin([
+      { from: joinToCwd('package.json'), to: '' }
+    ].concat(optionalFileRules))
+  ],
+  devServer: {
+    port: process.env.PORT
+  }
 });
