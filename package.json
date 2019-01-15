@@ -27,8 +27,8 @@
   },
   "license": "ISC",
   "dependencies": {
-    "@lampix/core": "^1.0.0-beta.8",
-    "@lampix/physics": "^0.2.0",
+    "@lampix/core": "^1.1.2",
+    "@lampix/physics": "^0.4.1",
     "animejs": "^2.2.0",
     "lodash.debounce": "^4.0.8",
     "matter-js": "^0.14.2",
