@@ -1,5 +1,5 @@
 {
   "depthClassifierParams": {
-    "frames_until_stable": 1
+    "frames_until_stable": 5
   }
 }
