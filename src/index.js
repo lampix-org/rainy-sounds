@@ -77,21 +77,30 @@ export function init() {
     registerDOMSimpleClassifiers();
     depthClassifier();
     let lastRandom;
-    Events.on(matterSetup.engine, 'collisionStart', (event) => {
-      const { pairs } = event;
-      if (pairs[0] && !pairs[0].touched) {
-        pairs[0].touched = true;
-        let randomNr = Math.floor(randomInt(0, audioList.length));
-        while (randomNr === lastRandom) {
-          randomNr = Math.floor(randomInt(0, audioList.length));
-        }
-        lastRandom = randomNr;
 
-        const sound = new Audio(audioList[randomNr]);
-        sound.volume = 0.6;
-        sound.play();
-      }
-    });
+    lampixCore
+      .getAppConfig()
+      .then((config) => {
+        if (!config.volume) {
+          return;
+        }
+
+        Events.on(matterSetup.engine, 'collisionStart', (event) => {
+          const { pairs } = event;
+          if (pairs[0] && !pairs[0].touched) {
+            pairs[0].touched = true;
+            let randomNr = Math.floor(randomInt(0, audioList.length));
+            while (randomNr === lastRandom) {
+              randomNr = Math.floor(randomInt(0, audioList.length));
+            }
+            lastRandom = randomNr;
+
+            const sound = new Audio(audioList[randomNr]);
+            sound.volume = config.volume;
+            sound.play();
+          }
+        });
+      });
 
     const refreshRateOnScreen = document.createElement('div');
     refreshRateOnScreen.setAttribute(
