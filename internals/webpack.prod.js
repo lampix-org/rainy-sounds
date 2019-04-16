@@ -20,6 +20,7 @@ const optionalFileRules = optionalFilesCopyRules([
 
 module.exports = () => ({
   mode: 'production',
+  devtool: 'source-map',
   output: {
     filename: '[name].[hash].js',
     path: joinToDist()
