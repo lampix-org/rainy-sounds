@@ -1,0 +1,6 @@
+{
+  "depthClassifierParams": {
+    "frames_until_stable": 5
+  },
+  "volume": 0.5
+}
